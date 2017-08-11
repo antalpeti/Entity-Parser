@@ -1,20 +1,23 @@
 package io.github.antalpeti.entityparser;
 
 import java.io.File;
+import java.util.concurrent.Callable;
 
 import io.github.antalpeti.entityparser.uielement.LabeledField;
 import javafx.application.Application;
+import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
@@ -30,13 +33,25 @@ public class Main extends Application {
 		projectcodeField.setStyle(fontStyle);
 		
 		final LabeledField projectcodeLabeledField = new LabeledField(5, projectcodeLabel, projectcodeField);
-
-		final BorderPane outputPane = new BorderPane();
+		
 		final TextArea outputArea = new TextArea();
 		outputArea.setWrapText(true);
-		outputArea.setStyle(fontStyle); 
-		outputPane.setCenter(outputArea);
-
+		outputArea.setStyle(fontStyle);
+		outputArea.setPrefHeight(8192D);
+		outputArea.setPrefWidth(8192D);
+		outputArea.setMaxWidth(Double.MAX_VALUE);
+		outputArea.setMaxHeight(Double.MAX_VALUE);
+        
+        GridPane outputPane = new GridPane();
+        GridPane.setVgrow(outputArea, Priority.ALWAYS);
+        GridPane.setHgrow(outputArea, Priority.ALWAYS);
+        outputPane.setMaxWidth(Double.MAX_VALUE);
+        outputPane.setMaxHeight(Double.MAX_VALUE);
+        Label outputLabel = new Label("Output:");
+        outputLabel.setStyle(fontStyle); 
+        outputPane.add(outputLabel, 0, 0);
+        outputPane.add(outputArea, 0, 1);
+		
 		final DirectoryChooser directoryChooser = new DirectoryChooser();
 
 		final Button browseButton = new Button("Choose Entity directory");
@@ -56,6 +71,7 @@ public class Main extends Application {
 		rootGroup.setPadding(new Insets(0, 0, 0, 0));
 
 		Scene scene = new Scene(rootGroup, 600, 600);
+//		scene.getStylesheets().add("css/styles.css");
 		stage.setTitle("Entity Parser");
 		stage.setScene(scene);
 		stage.show();

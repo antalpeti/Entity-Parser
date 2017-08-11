@@ -19,10 +19,6 @@ public class LabeledField extends HBox {
 		textField.setMaxWidth(Double.MAX_VALUE);
 	}
 
-	public void removeButton(Button button) {
-		getChildren().remove(button);
-	}
-
 	@Override
 	protected void layoutChildren() {
 		double minPrefWidth = calculatePrefChildWidth();
