@@ -23,6 +23,8 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
 public class Main extends Application {
+	private static double PREFERED_SIZE = 8192D;
+	
 	@Override
 	public void start(final Stage stage) {
 		String fontStyle = "-fx-font: normal bold 15px 'serif' ";
@@ -37,8 +39,8 @@ public class Main extends Application {
 		final TextArea outputArea = new TextArea();
 		outputArea.setWrapText(true);
 		outputArea.setStyle(fontStyle);
-		outputArea.setPrefHeight(8192D);
-		outputArea.setPrefWidth(8192D);
+		outputArea.setPrefHeight(PREFERED_SIZE);
+		outputArea.setPrefWidth(PREFERED_SIZE);
 		outputArea.setMaxWidth(Double.MAX_VALUE);
 		outputArea.setMaxHeight(Double.MAX_VALUE);
         
@@ -62,15 +64,15 @@ public class Main extends Application {
 		GridPane.setConstraints(projectcodeLabeledField, 0, 0);
 		GridPane.setConstraints(browseButton, 0, 1);
 		GridPane.setConstraints(outputPane, 0, 2);
-		inputGridPane.setHgap(0);
-		inputGridPane.setVgap(0);
+		inputGridPane.setHgap(1);
+		inputGridPane.setVgap(1);
 		inputGridPane.getChildren().addAll(projectcodeLabeledField, browseButton, outputPane);
 
 		final Pane rootGroup = new VBox(0);
 		rootGroup.getChildren().addAll(inputGridPane);
 		rootGroup.setPadding(new Insets(0, 0, 0, 0));
 
-		Scene scene = new Scene(rootGroup, 600, 600);
+		Scene scene = new Scene(rootGroup, 800, 800);
 //		scene.getStylesheets().add("css/styles.css");
 		stage.setTitle("Entity Parser");
 		stage.setScene(scene);
@@ -78,8 +80,8 @@ public class Main extends Application {
 	}
 
 	private void setBrowserButton(final Stage stage, final TextArea output, final DirectoryChooser directoryChooser, final Button browseButton) {
-		browseButton.setMaxWidth(8192D);
-		browseButton.setPrefWidth(8192D);
+		browseButton.setMaxWidth(PREFERED_SIZE);
+		browseButton.setPrefWidth(PREFERED_SIZE);
 		browseButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(final ActionEvent e) {
