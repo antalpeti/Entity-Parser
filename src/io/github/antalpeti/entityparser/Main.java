@@ -24,82 +24,110 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 	private static double PREFERED_SIZE = 8192D;
+	private static String FONT_STYLE = "-fx-font: normal bold 15px 'serif' ";
 	
 	@Override
 	public void start(final Stage stage) {
-		String fontStyle = "-fx-font: normal bold 15px 'serif' ";
 		
-		Label projectcodeLabel = new Label("Projectcode:");
-		projectcodeLabel.setStyle(fontStyle); 
-		final TextField projectcodeField = new TextField();
-		projectcodeField.setStyle(fontStyle);
+		final LabeledField projectcodeLabeledField = createProjectcodeLabeledField();
 		
-		final LabeledField projectcodeLabeledField = new LabeledField(5, projectcodeLabel, projectcodeField);
-		
-		final TextArea outputArea = new TextArea();
-		outputArea.setWrapText(true);
-		outputArea.setStyle(fontStyle);
-		outputArea.setPrefHeight(PREFERED_SIZE);
-		outputArea.setPrefWidth(PREFERED_SIZE);
-		outputArea.setMaxWidth(Double.MAX_VALUE);
-		outputArea.setMaxHeight(Double.MAX_VALUE);
+		final TextArea outputTextArea = createOutputTextArea();
         
-        GridPane outputPane = new GridPane();
-        GridPane.setVgrow(outputArea, Priority.ALWAYS);
-        GridPane.setHgrow(outputArea, Priority.ALWAYS);
-        outputPane.setMaxWidth(Double.MAX_VALUE);
-        outputPane.setMaxHeight(Double.MAX_VALUE);
-        Label outputLabel = new Label("Output:");
-        outputLabel.setStyle(fontStyle); 
-        outputPane.add(outputLabel, 0, 0);
-        outputPane.add(outputArea, 0, 1);
+        final GridPane outputGridPane = createOutputGridPane(outputTextArea);
 		
 		final DirectoryChooser directoryChooser = new DirectoryChooser();
 
-		final Button browseButton = new Button("Choose Entity directory");
-		browseButton.setStyle(fontStyle);
-		setBrowserButton(stage, outputArea, directoryChooser, browseButton);
+		final Button chooseEntityDirectoryButton = createChooseEntityDirectoryButton(stage, outputTextArea, directoryChooser);
 
-		final GridPane inputGridPane = new GridPane();
-		GridPane.setConstraints(projectcodeLabeledField, 0, 0);
-		GridPane.setConstraints(browseButton, 0, 1);
-		GridPane.setConstraints(outputPane, 0, 2);
-		inputGridPane.setHgap(1);
-		inputGridPane.setVgap(1);
-		inputGridPane.getChildren().addAll(projectcodeLabeledField, browseButton, outputPane);
+		final GridPane mainGridPane = createMainGridPane(projectcodeLabeledField, outputGridPane, chooseEntityDirectoryButton);
 
-		final Pane rootGroup = new VBox(0);
-		rootGroup.getChildren().addAll(inputGridPane);
-		rootGroup.setPadding(new Insets(0, 0, 0, 0));
+		final Pane mainPane = createMainPane(mainGridPane);
 
-		Scene scene = new Scene(rootGroup, 800, 800);
+		Scene scene = new Scene(mainPane, 800, 800);
 //		scene.getStylesheets().add("css/styles.css");
 		stage.setTitle("Entity Parser");
 		stage.setScene(scene);
 		stage.show();
 	}
 
-	private void setBrowserButton(final Stage stage, final TextArea output, final DirectoryChooser directoryChooser, final Button browseButton) {
-		browseButton.setMaxWidth(PREFERED_SIZE);
-		browseButton.setPrefWidth(PREFERED_SIZE);
-		browseButton.setOnAction(new EventHandler<ActionEvent>() {
+	private LabeledField createProjectcodeLabeledField() {
+		Label projectcodeLabel = new Label("Projectcode:");
+		projectcodeLabel.setStyle(FONT_STYLE); 
+		final TextField projectcodeField = new TextField();
+		projectcodeField.setStyle(FONT_STYLE);
+		
+		final LabeledField projectcodeLabeledField = new LabeledField(5, projectcodeLabel, projectcodeField);
+		return projectcodeLabeledField;
+	}
+	
+	private TextArea createOutputTextArea() {
+		final TextArea outputArea = new TextArea();
+		outputArea.setWrapText(true);
+		outputArea.setStyle(FONT_STYLE);
+		outputArea.setPrefHeight(PREFERED_SIZE);
+		outputArea.setPrefWidth(PREFERED_SIZE);
+		outputArea.setMaxWidth(Double.MAX_VALUE);
+		outputArea.setMaxHeight(Double.MAX_VALUE);
+		return outputArea;
+	}
+	
+	private GridPane createOutputGridPane(final TextArea outputTextArea) {
+		GridPane outputGridPane = new GridPane();
+		GridPane.setVgrow(outputTextArea, Priority.ALWAYS);
+		GridPane.setHgrow(outputTextArea, Priority.ALWAYS);
+		outputGridPane.setMaxWidth(Double.MAX_VALUE);
+		outputGridPane.setMaxHeight(Double.MAX_VALUE);
+		Label outputLabel = new Label("Output:");
+		outputLabel.setStyle(FONT_STYLE); 
+		outputGridPane.add(outputLabel, 0, 0);
+		outputGridPane.add(outputTextArea, 0, 1);
+		return outputGridPane;
+	}
+	
+	private Button createChooseEntityDirectoryButton(final Stage stage, final TextArea outputTextArea,
+			final DirectoryChooser directoryChooser) {
+		final Button chooseEntityDirectoryButton = new Button("Choose Entity directory");
+		chooseEntityDirectoryButton.setStyle(FONT_STYLE);
+		chooseEntityDirectoryButton.setMaxWidth(PREFERED_SIZE);
+		chooseEntityDirectoryButton.setPrefWidth(PREFERED_SIZE);
+		chooseEntityDirectoryButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(final ActionEvent e) {
 				configureDirectoryChooser(directoryChooser);
 				final File selectedDirectory = directoryChooser.showDialog(stage);
-
+				
 				if (selectedDirectory == null) {
-					output.setText("No Directory selected!");
+					outputTextArea.setText("No Directory selected!");
 				} else {
-					output.setText(selectedDirectory.getAbsolutePath());
+					outputTextArea.setText(selectedDirectory.getAbsolutePath());
 				}
 			}
 		});
+		return chooseEntityDirectoryButton;
 	}
-
+	
 	private static void configureDirectoryChooser(final DirectoryChooser directoryChooser) {
 		directoryChooser.setTitle("Choose Entity directory");
 		directoryChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+	}
+
+	private GridPane createMainGridPane(final LabeledField projectcodeLabeledField, final GridPane outputGridPane,
+			final Button chooseEntityDirectoryButton) {
+		final GridPane mainGridPane = new GridPane();
+		GridPane.setConstraints(projectcodeLabeledField, 0, 0);
+		GridPane.setConstraints(chooseEntityDirectoryButton, 0, 1);
+		GridPane.setConstraints(outputGridPane, 0, 2);
+		mainGridPane.setHgap(1);
+		mainGridPane.setVgap(1);
+		mainGridPane.getChildren().addAll(projectcodeLabeledField, chooseEntityDirectoryButton, outputGridPane);
+		return mainGridPane;
+	}
+
+	private Pane createMainPane(final GridPane mainGridPane) {
+		final Pane mainPane = new VBox(0);
+		mainPane.getChildren().addAll(mainGridPane);
+		mainPane.setPadding(new Insets(0, 0, 0, 0));
+		return mainPane;
 	}
 
 	public static void main(String[] args) {
