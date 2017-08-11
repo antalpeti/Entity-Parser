@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
 
+import io.github.antalpeti.entityparser.common.FileHandler;
 import io.github.antalpeti.entityparser.uielement.LabeledField;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -29,13 +30,10 @@ import javafx.stage.Stage;
 public class Main extends Application {
   private static final double PREFERED_SIZE = 8192D;
   private static final String FONT_STYLE = "-fx-font: normal bold 15px 'serif' ";
-  private static Properties properties = new Properties();
-  private static OutputStream outputStream = null;
-  private static InputStream inputStream = null;
 
   @Override
   public void start(final Stage stage) {
-    initStreams("config.properties");
+    FileHandler.getInstance().initStreams("config.properties");
 
     final LabeledField projectcodeLabeledField = createProjectcodeLabeledField();
 
@@ -56,27 +54,6 @@ public class Main extends Application {
     stage.setTitle("Entity Parser");
     stage.setScene(scene);
     stage.show();
-  }
-
-  private void initStreams(String filePath) {
-    initOutputStream(filePath);
-    initInputStream(filePath);
-  }
-
-  private void initOutputStream(String filePath) {
-    try {
-      outputStream = new FileOutputStream(filePath);
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
-    }
-  }
-
-  private void initInputStream(String filePath) {
-    try {
-      inputStream = new FileInputStream(filePath);
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
-    }
   }
 
   private LabeledField createProjectcodeLabeledField() {
@@ -129,7 +106,7 @@ public class Main extends Application {
           outputTextArea.setText("No Directory selected!");
         } else {
           outputTextArea.setText(selectedDirectory.getAbsolutePath());
-          storeProperties(selectedDirectory, "last.selected.directory", selectedDirectory.getAbsolutePath());
+          FileHandler.getInstance().storeProperties(selectedDirectory, "last.selected.directory", selectedDirectory.getAbsolutePath());
         }
       }
 
@@ -137,34 +114,15 @@ public class Main extends Application {
     return chooseEntityDirectoryButton;
   }
 
-  private void storeProperties(final File selectedDirectory, String key, String value) {
-    properties.setProperty(key, value);
-    try {
-      properties.store(outputStream, null);
-    } catch (IOException e1) {
-      e1.printStackTrace();
-    }
-  }
-
   private static void configureDirectoryChooser(final DirectoryChooser directoryChooser) {
     directoryChooser.setTitle("Choose Entity directory");
 
-    String lastSelectedDirectory = loadProperty(CONFIG_PROPERTIES_LAST_SELECTED_DIRECTORY);
+    String lastSelectedDirectory = FileHandler.getInstance().loadProperty(CONFIG_PROPERTIES_LAST_SELECTED_DIRECTORY);
     if (lastSelectedDirectory != null) {
       directoryChooser.setInitialDirectory(new File(lastSelectedDirectory));
     } else {
       directoryChooser.setInitialDirectory(new File(System.getProperty("user.home")));
     }
-  }
-
-  private static String loadProperty(String key) {
-    try {
-      properties.load(inputStream);
-      return properties.getProperty(key);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    return null;
   }
 
   private GridPane createMainGridPane(final LabeledField projectcodeLabeledField, final GridPane outputGridPane,
