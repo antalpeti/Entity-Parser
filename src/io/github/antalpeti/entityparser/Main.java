@@ -60,6 +60,7 @@ public class Main extends Application {
   private TextArea createOutputTextArea() {
     final TextArea outputArea = new TextArea();
     outputArea.setWrapText(true);
+    outputArea.setEditable(false);
     outputArea.setStyle(Constants.FONT_STYLE);
     outputArea.setPrefHeight(Constants.PREFERED_SIZE);
     outputArea.setPrefWidth(Constants.PREFERED_SIZE);
