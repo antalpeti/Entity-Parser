@@ -80,17 +80,6 @@ public class FileHandler {
     return null;
   }
 
-  public void listFiles(File directory, List<File> files) {
-    File[] fileList = directory.listFiles();
-    for (File file : fileList) {
-      if (file.isFile()) {
-        files.add(file);
-      } else if (file.isDirectory()) {
-        listFiles(file, files);
-      }
-    }
-  }
-
   public void listDirectories(File directory, List<File> files) {
     File[] fileList = directory.listFiles();
     for (File file : fileList) {
@@ -103,13 +92,31 @@ public class FileHandler {
     }
   }
 
-  public void countFiles(File directory, List<Double> countedFilesList, String extension) {
+  /**
+   * Count all files in the directory and all sub directories.
+   * 
+   * @param directory
+   *          actual examined directory
+   * @param countedFilesList
+   *          this is for the sum of the files
+   * @param files
+   *          the collection of found files
+   * @param extension
+   *          if no extension then count all files
+   */
+  public void listFiles(File directory, List<Double> countedFilesList, List<File> files, String extension) {
     File[] fileList = directory.listFiles();
     for (File file : fileList) {
       if (file.isDirectory()) {
-        countFiles(file, countedFilesList, extension);
+        listFiles(file, countedFilesList, files, extension);
       } else if (file.isFile()) {
-        countedFilesList.set(0, countedFilesList.get(0) + 1d);
+        if (!Util.isEmpty(extension) && file.getName().endsWith(extension)) {
+          files.add(file);
+          countedFilesList.set(0, countedFilesList.get(0) + 1d);
+        } else if (Util.isEmpty(extension)) {
+          files.add(file);
+          countedFilesList.set(0, countedFilesList.get(0) + 1d);
+        }
         continue;
       }
     }

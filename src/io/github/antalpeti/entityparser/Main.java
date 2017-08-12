@@ -26,11 +26,12 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 
 public class Main extends Application {
 
   private TextArea outputTextArea;
+  private ProgressBar progressBar;
+  private ProgressIndicator progressIndicator;
 
   @Override
   public void start(final Stage stage) {
@@ -44,7 +45,9 @@ public class Main extends Application {
 
     final Button chooseEntityDirectoryButton = createChoseEntityDirectoryButton(stage, directoryChooser);
 
-    final GridPane mainGridPane = createMainGridPane(projectcodeLabeledField, outputGridPane, chooseEntityDirectoryButton);
+    HBox progressHBox = createProgressHBox();
+
+    final GridPane mainGridPane = createMainGridPane(projectcodeLabeledField, progressHBox, chooseEntityDirectoryButton, outputGridPane);
 
     final Pane mainPane = createMainPane(mainGridPane);
 
@@ -127,30 +130,8 @@ public class Main extends Application {
 
   @SuppressWarnings("unchecked")
   private void processFiles() {
-    HBox progressHBox = new HBox();
 
-    Label progressLabel = new Label("Progress:");
-    progressLabel.setStyle(Constants.FONT_STYLE);
-    double width = outputTextArea.getWidth();
-    progressLabel.setPrefWidth(width * 0.2);
-
-    ProgressBar progressBar = new ProgressBar();
-    progressBar.setPrefWidth(width * 0.7);
-    progressBar.setProgress(0d);
-
-    ProgressIndicator progressIndicator = new ProgressIndicator();
-    progressIndicator.setPrefWidth(width * 0.1);
-    progressIndicator.setProgress(0d);
-
-    progressHBox.setSpacing(1);
-    progressHBox.setPrefWidth(width);
-    progressHBox.setPadding(new Insets(1));
-    progressHBox.getChildren().addAll(progressLabel, progressBar, progressIndicator);
-
-    Stage progressStage = new Stage(StageStyle.UTILITY);
-    progressStage.setTitle("Parsing entities...");
-    progressStage.setScene(new Scene(progressHBox));
-    progressStage.show();
+    // progressStage.show();
 
     @SuppressWarnings("rawtypes")
     Task longTask = new Task<Double>() {
@@ -160,24 +141,22 @@ public class Main extends Application {
 
         List<Double> countedFilesList = new ArrayList<>();
         countedFilesList.add(new Double(0));
+        List<File> files = new ArrayList<>();
         String extension = "java";
-        FileHandler.getInstance().countFiles(selectedDirectory, countedFilesList, extension);
+
+        FileHandler.getInstance().listFiles(selectedDirectory, countedFilesList, files, extension);
         Double countedFiles = countedFilesList.get(0);
 
-        List<File> files = new ArrayList<>();
         Double processedFiles = new Double(0.0);
-        FileHandler.getInstance().listFiles(selectedDirectory, files);
-
         updateProgress(0d, 0d);
 
         StringBuilder output = new StringBuilder();
 
         for (File file : files) {
-          output.append(file.getAbsolutePath());
+          output.append(file.getName());
           output.append("\n");
           ++processedFiles;
           updateProgress(processedFiles, countedFiles);
-          // updateMessage("Task part " + String.valueOf(i) + " complete");
         }
 
         outputTextArea.setText(output.toString());
@@ -195,21 +174,42 @@ public class Main extends Application {
     };
     progressBar.progressProperty().bind(longTask.progressProperty());
     progressIndicator.progressProperty().bind(longTask.progressProperty());
-    // progressLabel.textProperty().bind(longTask.messageProperty());
 
-    progressStage.show();
     new Thread(longTask).start();
   }
 
-  private GridPane createMainGridPane(final LabeledField projectcodeLabeledField, final GridPane outputGridPane,
-      final Button chooseEntityDirectoryButton) {
+  private HBox createProgressHBox() {
+    HBox progressHBox = new HBox();
+    progressHBox.setSpacing(1);
+    progressHBox.prefWidthProperty().bind(outputTextArea.widthProperty());
+    progressHBox.setPadding(new Insets(1));
+
+    Label progressLabel = new Label("Progress:");
+    progressLabel.setStyle(Constants.FONT_STYLE);
+    progressLabel.prefWidthProperty().bind(progressHBox.widthProperty().multiply(0.1));
+
+    progressBar = new ProgressBar();
+    progressBar.prefWidthProperty().bind(progressHBox.widthProperty().multiply(0.8));
+    progressBar.setProgress(0d);
+
+    progressIndicator = new ProgressIndicator();
+    progressIndicator.prefWidthProperty().bind(progressHBox.widthProperty().multiply(0.1));
+    progressIndicator.setProgress(0d);
+
+    progressHBox.getChildren().addAll(progressLabel, progressBar, progressIndicator);
+    return progressHBox;
+  }
+
+  private GridPane createMainGridPane(final LabeledField projectcodeLabeledField, HBox progressHBox, final Button chooseEntityDirectoryButton,
+      final GridPane outputGridPane) {
     final GridPane mainGridPane = new GridPane();
     GridPane.setConstraints(projectcodeLabeledField, 0, 0);
-    GridPane.setConstraints(chooseEntityDirectoryButton, 0, 1);
-    GridPane.setConstraints(outputGridPane, 0, 2);
+    GridPane.setConstraints(progressHBox, 0, 1);
+    GridPane.setConstraints(chooseEntityDirectoryButton, 0, 2);
+    GridPane.setConstraints(outputGridPane, 0, 3);
     mainGridPane.setHgap(1);
     mainGridPane.setVgap(1);
-    mainGridPane.getChildren().addAll(projectcodeLabeledField, chooseEntityDirectoryButton, outputGridPane);
+    mainGridPane.getChildren().addAll(projectcodeLabeledField, progressHBox, chooseEntityDirectoryButton, outputGridPane);
     return mainGridPane;
   }
 
