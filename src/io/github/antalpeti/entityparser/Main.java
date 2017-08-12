@@ -1,6 +1,8 @@
 package io.github.antalpeti.entityparser;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import io.github.antalpeti.entityparser.common.Constants;
 import io.github.antalpeti.entityparser.common.FileHandler;
@@ -92,7 +94,14 @@ public class Main extends Application {
         if (selectedDirectory == null) {
           outputTextArea.setText("No Directory selected!");
         } else {
-          outputTextArea.setText(selectedDirectory.getAbsolutePath());
+          List<File> files = new ArrayList<>();
+          FileHandler.getInstance().listDirectories(selectedDirectory.getAbsolutePath(), files);
+          StringBuilder output = new StringBuilder();
+          for (File file : files) {
+            output.append(file.getAbsolutePath());
+            output.append("\n");
+          }
+          outputTextArea.setText(output.toString());
           FileHandler.getInstance().storeProperties(selectedDirectory, Constants.FILEPATH_CONFIG_PROPERTIES,
               Constants.CONFIG_PROPERTIES_LAST_SELECTED_DIRECTORY, selectedDirectory.getAbsolutePath());
         }

@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.Properties;
 
 public class FileHandler {
@@ -77,5 +78,32 @@ public class FileHandler {
       }
     }
     return null;
+  }
+
+  public void listFiles(String directoryName, List<File> files) {
+    File directory = new File(directoryName);
+
+    File[] fileList = directory.listFiles();
+    for (File file : fileList) {
+      if (file.isFile()) {
+        files.add(file);
+      } else if (file.isDirectory()) {
+        listFiles(file.getAbsolutePath(), files);
+      }
+    }
+  }
+
+  public void listDirectories(String directoryName, List<File> files) {
+    File directory = new File(directoryName);
+
+    File[] fileList = directory.listFiles();
+    for (File file : fileList) {
+      if (file.isDirectory()) {
+        files.add(file);
+        listDirectories(file.getAbsolutePath(), files);
+      } else if (file.isFile()) {
+        continue;
+      }
+    }
   }
 }
