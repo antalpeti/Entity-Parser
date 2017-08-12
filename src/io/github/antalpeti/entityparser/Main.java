@@ -1,14 +1,8 @@
 package io.github.antalpeti.entityparser;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Properties;
 
+import io.github.antalpeti.entityparser.common.Constants;
 import io.github.antalpeti.entityparser.common.FileHandler;
 import io.github.antalpeti.entityparser.uielement.LabeledField;
 import javafx.application.Application;
@@ -28,13 +22,8 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
 public class Main extends Application {
-  private static final double PREFERED_SIZE = 8192D;
-  private static final String FONT_STYLE = "-fx-font: normal bold 15px 'serif' ";
-
   @Override
   public void start(final Stage stage) {
-    FileHandler.getInstance().initStreams("config.properties");
-
     final LabeledField projectcodeLabeledField = createProjectcodeLabeledField();
 
     final TextArea outputTextArea = createOutputTextArea();
@@ -58,9 +47,9 @@ public class Main extends Application {
 
   private LabeledField createProjectcodeLabeledField() {
     Label projectcodeLabel = new Label("Projectcode:");
-    projectcodeLabel.setStyle(FONT_STYLE);
+    projectcodeLabel.setStyle(Constants.FONT_STYLE);
     final TextField projectcodeField = new TextField();
-    projectcodeField.setStyle(FONT_STYLE);
+    projectcodeField.setStyle(Constants.FONT_STYLE);
 
     final LabeledField projectcodeLabeledField = new LabeledField(5, projectcodeLabel, projectcodeField);
     return projectcodeLabeledField;
@@ -69,9 +58,9 @@ public class Main extends Application {
   private TextArea createOutputTextArea() {
     final TextArea outputArea = new TextArea();
     outputArea.setWrapText(true);
-    outputArea.setStyle(FONT_STYLE);
-    outputArea.setPrefHeight(PREFERED_SIZE);
-    outputArea.setPrefWidth(PREFERED_SIZE);
+    outputArea.setStyle(Constants.FONT_STYLE);
+    outputArea.setPrefHeight(Constants.PREFERED_SIZE);
+    outputArea.setPrefWidth(Constants.PREFERED_SIZE);
     outputArea.setMaxWidth(Double.MAX_VALUE);
     outputArea.setMaxHeight(Double.MAX_VALUE);
     return outputArea;
@@ -84,19 +73,17 @@ public class Main extends Application {
     outputGridPane.setMaxWidth(Double.MAX_VALUE);
     outputGridPane.setMaxHeight(Double.MAX_VALUE);
     Label outputLabel = new Label("Output:");
-    outputLabel.setStyle(FONT_STYLE);
+    outputLabel.setStyle(Constants.FONT_STYLE);
     outputGridPane.add(outputLabel, 0, 0);
     outputGridPane.add(outputTextArea, 0, 1);
     return outputGridPane;
   }
 
-  private static final String CONFIG_PROPERTIES_LAST_SELECTED_DIRECTORY = "last.selected.directory";
-
   private Button createChoseEntityDirectoryButton(final Stage stage, final TextArea outputTextArea, final DirectoryChooser directoryChooser) {
     final Button chooseEntityDirectoryButton = new Button("Chose Entity directory");
-    chooseEntityDirectoryButton.setStyle(FONT_STYLE);
-    chooseEntityDirectoryButton.setMaxWidth(PREFERED_SIZE);
-    chooseEntityDirectoryButton.setPrefWidth(PREFERED_SIZE);
+    chooseEntityDirectoryButton.setStyle(Constants.FONT_STYLE);
+    chooseEntityDirectoryButton.setMaxWidth(Constants.PREFERED_SIZE);
+    chooseEntityDirectoryButton.setPrefWidth(Constants.PREFERED_SIZE);
     chooseEntityDirectoryButton.setOnAction(new EventHandler<ActionEvent>() {
       @Override
       public void handle(final ActionEvent e) {
@@ -106,7 +93,8 @@ public class Main extends Application {
           outputTextArea.setText("No Directory selected!");
         } else {
           outputTextArea.setText(selectedDirectory.getAbsolutePath());
-          FileHandler.getInstance().storeProperties(selectedDirectory, "last.selected.directory", selectedDirectory.getAbsolutePath());
+          FileHandler.getInstance().storeProperties(selectedDirectory, Constants.FILEPATH_CONFIG_PROPERTIES,
+              Constants.CONFIG_PROPERTIES_LAST_SELECTED_DIRECTORY, selectedDirectory.getAbsolutePath());
         }
       }
 
@@ -117,7 +105,8 @@ public class Main extends Application {
   private static void configureDirectoryChooser(final DirectoryChooser directoryChooser) {
     directoryChooser.setTitle("Choose Entity directory");
 
-    String lastSelectedDirectory = FileHandler.getInstance().loadProperty(CONFIG_PROPERTIES_LAST_SELECTED_DIRECTORY);
+    String lastSelectedDirectory = FileHandler.getInstance().loadProperty(Constants.FILEPATH_CONFIG_PROPERTIES,
+        Constants.CONFIG_PROPERTIES_LAST_SELECTED_DIRECTORY);
     if (lastSelectedDirectory != null) {
       directoryChooser.setInitialDirectory(new File(lastSelectedDirectory));
     } else {
