@@ -81,8 +81,10 @@ public class Main extends Application {
     return outputGridPane;
   }
 
+  private static final String TITLE_CHOOSE_ENTITY_DIRECTORY = "Choose Entity directory";
+
   private Button createChoseEntityDirectoryButton(final Stage stage, final TextArea outputTextArea, final DirectoryChooser directoryChooser) {
-    final Button chooseEntityDirectoryButton = new Button("Chose Entity directory");
+    final Button chooseEntityDirectoryButton = new Button(TITLE_CHOOSE_ENTITY_DIRECTORY);
     chooseEntityDirectoryButton.setStyle(Constants.FONT_STYLE);
     chooseEntityDirectoryButton.setMaxWidth(Constants.PREFERED_SIZE);
     chooseEntityDirectoryButton.setPrefWidth(Constants.PREFERED_SIZE);
@@ -112,7 +114,7 @@ public class Main extends Application {
   }
 
   private static void configureDirectoryChooser(final DirectoryChooser directoryChooser) {
-    directoryChooser.setTitle("Choose Entity directory");
+    directoryChooser.setTitle(TITLE_CHOOSE_ENTITY_DIRECTORY);
 
     String lastSelectedDirectory = FileHandler.getInstance().loadProperty(Constants.FILEPATH_CONFIG_PROPERTIES,
         Constants.CONFIG_PROPERTIES_LAST_SELECTED_DIRECTORY);
