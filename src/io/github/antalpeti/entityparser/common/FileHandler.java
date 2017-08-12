@@ -80,28 +80,36 @@ public class FileHandler {
     return null;
   }
 
-  public void listFiles(String directoryName, List<File> files) {
-    File directory = new File(directoryName);
-
+  public void listFiles(File directory, List<File> files) {
     File[] fileList = directory.listFiles();
     for (File file : fileList) {
       if (file.isFile()) {
         files.add(file);
       } else if (file.isDirectory()) {
-        listFiles(file.getAbsolutePath(), files);
+        listFiles(file, files);
       }
     }
   }
 
-  public void listDirectories(String directoryName, List<File> files) {
-    File directory = new File(directoryName);
-
+  public void listDirectories(File directory, List<File> files) {
     File[] fileList = directory.listFiles();
     for (File file : fileList) {
       if (file.isDirectory()) {
         files.add(file);
-        listDirectories(file.getAbsolutePath(), files);
+        listDirectories(file, files);
       } else if (file.isFile()) {
+        continue;
+      }
+    }
+  }
+
+  public void countFiles(File directory, List<Double> countedFilesList, String extension) {
+    File[] fileList = directory.listFiles();
+    for (File file : fileList) {
+      if (file.isDirectory()) {
+        countFiles(file, countedFilesList, extension);
+      } else if (file.isFile()) {
+        countedFilesList.set(0, countedFilesList.get(0) + 1d);
         continue;
       }
     }
