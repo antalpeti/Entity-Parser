@@ -1,11 +1,17 @@
 package io.github.antalpeti.entityparser;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import io.github.antalpeti.entityparser.common.Constants;
 import io.github.antalpeti.entityparser.common.FileHandler;
+import io.github.antalpeti.entityparser.common.Util;
 import io.github.antalpeti.entityparser.uielement.LabeledField;
 import javafx.application.Application;
 import javafx.concurrent.Task;
@@ -58,10 +64,12 @@ public class Main extends Application {
     stage.show();
   }
 
+  private TextField projectcodeField;
+
   private LabeledField createProjectcodeLabeledField() {
     Label projectcodeLabel = new Label("Projectcode:");
     projectcodeLabel.setStyle(Constants.FONT_STYLE);
-    final TextField projectcodeField = new TextField();
+    projectcodeField = new TextField();
     projectcodeField.setStyle(Constants.FONT_STYLE);
 
     final LabeledField projectcodeLabeledField = new LabeledField(5, projectcodeLabel, projectcodeField);
@@ -134,9 +142,9 @@ public class Main extends Application {
     // progressStage.show();
 
     @SuppressWarnings("rawtypes")
-    Task longTask = new Task<Double>() {
+    Task longTask = new Task<Void>() {
       @Override
-      protected Double call() throws Exception {
+      protected Void call() throws Exception {
         updateProgress(-1d, 0d);
 
         List<Double> countedFilesList = new ArrayList<>();
@@ -152,9 +160,96 @@ public class Main extends Application {
 
         StringBuilder output = new StringBuilder();
 
+        String projectcode = projectcodeField.getText();
+        if (Util.isEmpty(projectcode)) {
+          outputTextArea.setText("The projectcode is missing.");
+          return null;
+        }
+
         for (File file : files) {
-          output.append(file.getName());
-          output.append("\n");
+          try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file.getAbsolutePath()))) {
+            String currentLine;
+            boolean packageFounded = false;
+            String packageName = null;
+            boolean nameAnnotationFounded = false;
+            String nameAnnotationValue = null;
+            boolean tableAnnotationFounded = false;
+            String tableAnnotationValue = null;
+            boolean classNameFounded = false;
+            String className = null;
+
+            while ((currentLine = bufferedReader.readLine()) != null) {
+              if (currentLine.isEmpty()) {
+                continue;
+              }
+              String regex = "package";
+              int indexOf = currentLine.indexOf(regex);
+              if (!packageFounded && indexOf != -1) {
+                packageFounded = true;
+                Pattern pattern = Pattern.compile("(hu[.a-zA-Z]+)");
+                Matcher matcher = pattern.matcher(currentLine);
+                if (matcher.find(indexOf + regex.length())) {
+                  packageName = matcher.group(1);
+                  continue;
+                }
+              }
+              regex = "@Name";
+              indexOf = currentLine.indexOf(regex);
+              if (!nameAnnotationFounded && indexOf != -1) {
+                nameAnnotationFounded = true;
+                Pattern pattern = Pattern.compile("([.a-zA-Z]+)");
+                Matcher matcher = pattern.matcher(currentLine);
+                if (matcher.find(indexOf + regex.length())) {
+                  nameAnnotationValue = matcher.group(1);
+                  continue;
+                }
+              }
+              regex = "@Table";
+              indexOf = currentLine.indexOf(regex);
+              if (!tableAnnotationFounded && indexOf != -1) {
+                tableAnnotationFounded = true;
+                int beginIndex = currentLine.indexOf("\"", indexOf);
+                int endIndex = currentLine.indexOf("\"", beginIndex + 1);
+                tableAnnotationValue = currentLine.substring(beginIndex + 1, endIndex);
+                continue;
+              }
+              regex = "public\\sclass";
+              indexOf = Util.indexOf(Pattern.compile(regex), currentLine);
+              if (!classNameFounded && indexOf != -1) {
+                classNameFounded = true;
+                Pattern pattern = Pattern.compile("([.a-zA-Z]+)");
+                Matcher matcher = pattern.matcher(currentLine);
+                if (matcher.find(indexOf + regex.length())) {
+                  className = matcher.group(1);
+                  continue;
+                }
+              }
+              if ((nameAnnotationFounded && tableAnnotationFounded) || (packageFounded && classNameFounded && tableAnnotationFounded)) {
+                break;
+              }
+            }
+            if (Util.isEmpty(nameAnnotationValue)
+                && (!Util.isEmpty(packageName) && !Util.isEmpty(className) && !Util.isEmpty(tableAnnotationValue))) {
+              output.append(packageName);
+              output.append(".");
+              output.append(className);
+              output.append("\t");
+              output.append(tableAnnotationValue);
+              output.append("\t");
+              output.append(projectcode);
+              output.append("\n");
+            } else if (!Util.isEmpty(nameAnnotationValue) && !Util.isEmpty(tableAnnotationValue)) {
+              output.append(nameAnnotationValue);
+              output.append("\t");
+              output.append(tableAnnotationValue);
+              output.append("\t");
+              output.append(projectcode);
+              output.append("\n");
+            }
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
+
           ++processedFiles;
           updateProgress(processedFiles, countedFiles);
         }
@@ -163,8 +258,7 @@ public class Main extends Application {
 
         FileHandler.getInstance().storeProperties(selectedDirectory, Constants.FILEPATH_CONFIG_PROPERTIES,
             Constants.CONFIG_PROPERTIES_LAST_SELECTED_DIRECTORY, selectedDirectory.getAbsolutePath());
-
-        return countedFiles;
+        return null;
       }
 
       @Override
@@ -181,7 +275,7 @@ public class Main extends Application {
   private HBox createProgressHBox() {
     HBox progressHBox = new HBox();
     progressHBox.setSpacing(1);
-    progressHBox.prefWidthProperty().bind(outputTextArea.widthProperty());
+    progressHBox.prefWidthProperty().bind(outputTextArea.prefWidthProperty());
     progressHBox.setPadding(new Insets(1));
 
     Label progressLabel = new Label("Progress:");
