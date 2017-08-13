@@ -136,11 +136,7 @@ public class Main extends Application {
     }
   }
 
-  @SuppressWarnings("unchecked")
   private void processFiles() {
-
-    // progressStage.show();
-
     @SuppressWarnings("rawtypes")
     Task longTask = new Task<Void>() {
       @Override
