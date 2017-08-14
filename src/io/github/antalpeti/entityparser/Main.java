@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -127,8 +129,14 @@ public class Main extends Application {
   private static void configureDirectoryChooser(final DirectoryChooser directoryChooser) {
     directoryChooser.setTitle(TITLE_CHOOSE_ENTITY_DIRECTORY);
 
-    String lastSelectedDirectory = FileHandler.getInstance().loadProperty(Constants.FILEPATH_CONFIG_PROPERTIES,
+    String lastSelectedDirectory = null;
+    Path currentRelativePath = Paths.get("");
+    String configPropertiesAbsolutePath = currentRelativePath.toAbsolutePath().toString() + File.separator + Constants.FILEPATH_CONFIG_PROPERTIES;
+	File f = new File(configPropertiesAbsolutePath);
+    if(f.exists() && !f.isDirectory()) { 
+    	lastSelectedDirectory = FileHandler.getInstance().loadProperty(Constants.FILEPATH_CONFIG_PROPERTIES,
         Constants.CONFIG_PROPERTIES_LAST_SELECTED_DIRECTORY);
+    }
     if (lastSelectedDirectory != null) {
       directoryChooser.setInitialDirectory(new File(lastSelectedDirectory));
     } else {
