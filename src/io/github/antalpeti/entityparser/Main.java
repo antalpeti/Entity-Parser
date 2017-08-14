@@ -119,7 +119,14 @@ public class Main extends Application {
         if (selectedDirectory == null) {
           outputTextArea.setText("No Directory selected!");
         } else {
-          processFiles();
+          boolean errorExist = false;
+          if (Util.isEmpty(projectcodeField.getText())) {
+            outputTextArea.setText("The projectcode is missing.");
+            errorExist = true;
+          }
+          if (!errorExist) {
+            processFiles();
+          }
         }
       }
     });
@@ -132,10 +139,10 @@ public class Main extends Application {
     String lastSelectedDirectory = null;
     Path currentRelativePath = Paths.get("");
     String configPropertiesAbsolutePath = currentRelativePath.toAbsolutePath().toString() + File.separator + Constants.FILEPATH_CONFIG_PROPERTIES;
-	File f = new File(configPropertiesAbsolutePath);
-    if(f.exists() && !f.isDirectory()) { 
-    	lastSelectedDirectory = FileHandler.getInstance().loadProperty(Constants.FILEPATH_CONFIG_PROPERTIES,
-        Constants.CONFIG_PROPERTIES_LAST_SELECTED_DIRECTORY);
+    File f = new File(configPropertiesAbsolutePath);
+    if (f.exists() && !f.isDirectory()) {
+      lastSelectedDirectory = FileHandler.getInstance().loadProperty(Constants.FILEPATH_CONFIG_PROPERTIES,
+          Constants.CONFIG_PROPERTIES_LAST_SELECTED_DIRECTORY);
     }
     if (lastSelectedDirectory != null) {
       directoryChooser.setInitialDirectory(new File(lastSelectedDirectory));
