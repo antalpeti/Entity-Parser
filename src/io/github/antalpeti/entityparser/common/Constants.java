@@ -7,4 +7,5 @@ public class Constants {
   public static final String CONFIG_PROPERTIES_LAST_SELECTED_DIRECTORY = "last.selected.directory";
 
   public static final String FILEPATH_CONFIG_PROPERTIES = "config.properties";
+  public static final String FILEPATH_ABOUT_HTML = "about.html";
 }

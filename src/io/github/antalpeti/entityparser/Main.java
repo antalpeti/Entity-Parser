@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -27,11 +29,15 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
@@ -49,13 +55,15 @@ public class Main extends Application {
 
     final GridPane outputGridPane = createOutputGridPane(outputTextArea);
 
+    final Button aboutButton = createAboutButton();
+
     final DirectoryChooser directoryChooser = new DirectoryChooser();
 
     final Button chooseEntityDirectoryButton = createChoseEntityDirectoryButton(stage, directoryChooser);
 
     HBox progressHBox = createProgressHBox();
 
-    final GridPane mainGridPane = createMainGridPane(projectcodeLabeledField, progressHBox, chooseEntityDirectoryButton, outputGridPane);
+    final GridPane mainGridPane = createMainGridPane(projectcodeLabeledField, progressHBox, chooseEntityDirectoryButton, outputGridPane, aboutButton);
 
     final Pane mainPane = createMainPane(mainGridPane);
 
@@ -131,6 +139,51 @@ public class Main extends Application {
       }
     });
     return chooseEntityDirectoryButton;
+  }
+
+  private Button createAboutButton() {
+    final Button aboutButton = new Button("About");
+    aboutButton.setStyle(Constants.FONT_STYLE);
+    aboutButton.setMaxWidth(Constants.PREFERRED_SIZE);
+    aboutButton.setPrefWidth(Constants.PREFERRED_SIZE);
+    aboutButton.setOnAction(new EventHandler<ActionEvent>() {
+      @Override
+      public void handle(final ActionEvent e) {
+        final WebView browser = new WebView();
+        final WebEngine webEngine = browser.getEngine();
+        try {
+          Path currentRelativePath = Paths.get("");
+          File file = new File(currentRelativePath.toAbsolutePath().toString() + File.separator + Constants.FILEPATH_ABOUT_HTML);
+          URL url = file.toURI().toURL();
+          webEngine.load(url.toString());
+
+          VBox root = new VBox();
+          root.getChildren().addAll(browser);
+
+          Scene scene = new Scene(root);
+          Stage stage = new Stage();
+          scene.addEventHandler(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent t) {
+              if (t.getCode() == KeyCode.ESCAPE) {
+                stage.close();
+              }
+            }
+          });
+
+          stage.setTitle("About");
+          stage.setScene(scene);
+          stage.setWidth(800);
+          stage.setHeight(800);
+
+          stage.show();
+        } catch (MalformedURLException ex) {
+          ex.printStackTrace();
+        }
+
+      }
+    });
+    return aboutButton;
   }
 
   private static void configureDirectoryChooser(final DirectoryChooser directoryChooser) {
@@ -302,15 +355,16 @@ public class Main extends Application {
   }
 
   private GridPane createMainGridPane(final LabeledField projectcodeLabeledField, HBox progressHBox, final Button chooseEntityDirectoryButton,
-      final GridPane outputGridPane) {
+      final GridPane outputGridPane, final Button aboutButton) {
     final GridPane mainGridPane = new GridPane();
     GridPane.setConstraints(projectcodeLabeledField, 0, 0);
     GridPane.setConstraints(progressHBox, 0, 1);
     GridPane.setConstraints(chooseEntityDirectoryButton, 0, 2);
     GridPane.setConstraints(outputGridPane, 0, 3);
+    GridPane.setConstraints(aboutButton, 0, 4);
     mainGridPane.setHgap(1);
     mainGridPane.setVgap(1);
-    mainGridPane.getChildren().addAll(projectcodeLabeledField, progressHBox, chooseEntityDirectoryButton, outputGridPane);
+    mainGridPane.getChildren().addAll(projectcodeLabeledField, progressHBox, chooseEntityDirectoryButton, outputGridPane, aboutButton);
     return mainGridPane;
   }
 
