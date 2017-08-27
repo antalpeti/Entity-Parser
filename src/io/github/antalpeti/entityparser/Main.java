@@ -172,10 +172,6 @@ public class Main extends Application {
         StringBuilder output = new StringBuilder();
 
         String projectcode = projectcodeField.getText();
-        if (Util.isEmpty(projectcode)) {
-          outputTextArea.setText("The projectcode is missing.");
-          return null;
-        }
 
         for (File file : files) {
           try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file.getAbsolutePath()))) {
@@ -197,7 +193,7 @@ public class Main extends Application {
               int indexOf = currentLine.indexOf(regex);
               if (!packageFounded && indexOf != -1) {
                 packageFounded = true;
-                Pattern pattern = Pattern.compile("(hu[.a-zA-Z]+)");
+                Pattern pattern = Pattern.compile("(hu[.a-zA-Z0-9]+)");
                 Matcher matcher = pattern.matcher(currentLine);
                 if (matcher.find(indexOf + regex.length())) {
                   packageName = matcher.group(1);
@@ -208,7 +204,7 @@ public class Main extends Application {
               indexOf = currentLine.indexOf(regex);
               if (!nameAnnotationFounded && indexOf != -1) {
                 nameAnnotationFounded = true;
-                Pattern pattern = Pattern.compile("([.a-zA-Z]+)");
+                Pattern pattern = Pattern.compile("([.a-zA-Z0-9]+)");
                 Matcher matcher = pattern.matcher(currentLine);
                 if (matcher.find(indexOf + regex.length())) {
                   nameAnnotationValue = matcher.group(1);
@@ -228,7 +224,7 @@ public class Main extends Application {
               indexOf = Util.indexOf(Pattern.compile(regex), currentLine);
               if (!classNameFounded && indexOf != -1) {
                 classNameFounded = true;
-                Pattern pattern = Pattern.compile("([.a-zA-Z]+)");
+                Pattern pattern = Pattern.compile("([.a-zA-Z0-9]+)");
                 Matcher matcher = pattern.matcher(currentLine);
                 if (matcher.find(indexOf + regex.length())) {
                   className = matcher.group(1);
