@@ -257,12 +257,10 @@ public class Main extends Application {
               indexOf = currentLine.indexOf(regex);
               if (!nameAnnotationFounded && indexOf != -1) {
                 nameAnnotationFounded = true;
-                Pattern pattern = Pattern.compile("([.a-zA-Z0-9]+)");
-                Matcher matcher = pattern.matcher(currentLine);
-                if (matcher.find(indexOf + regex.length())) {
-                  nameAnnotationValue = matcher.group(1);
-                  continue;
-                }
+                int beginIndex = currentLine.indexOf("\"", indexOf);
+                int endIndex = currentLine.indexOf("\"", beginIndex + 1);
+                nameAnnotationValue = currentLine.substring(beginIndex + 1, endIndex);
+                continue;
               }
               regex = "@Table";
               indexOf = currentLine.indexOf(regex);
