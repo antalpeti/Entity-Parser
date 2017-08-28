@@ -59,7 +59,7 @@ public class Main extends Application {
 
     final DirectoryChooser directoryChooser = new DirectoryChooser();
 
-    final Button chooseEntityDirectoryButton = createChoseEntityDirectoryButton(stage, directoryChooser);
+    final Button chooseEntityDirectoryButton = createChooseEntityDirectoryButton(stage, directoryChooser);
 
     HBox progressHBox = createProgressHBox();
 
@@ -68,7 +68,6 @@ public class Main extends Application {
     final Pane mainPane = createMainPane(mainGridPane);
 
     Scene scene = new Scene(mainPane, 800, 800);
-    // scene.getStylesheets().add("css/styles.css");
     stage.setTitle("Entity Parser");
     stage.setScene(scene);
     stage.show();
@@ -110,37 +109,7 @@ public class Main extends Application {
     outputGridPane.add(outputTextArea, 0, 1);
     return outputGridPane;
   }
-
-  private static final String TITLE_CHOOSE_ENTITY_DIRECTORY = "Choose Entity directory";
-  private File selectedDirectory;
-
-  private Button createChoseEntityDirectoryButton(final Stage stage, final DirectoryChooser directoryChooser) {
-    final Button chooseEntityDirectoryButton = new Button(TITLE_CHOOSE_ENTITY_DIRECTORY);
-    chooseEntityDirectoryButton.setStyle(Constants.FONT_STYLE);
-    chooseEntityDirectoryButton.setMaxWidth(Constants.PREFERRED_SIZE);
-    chooseEntityDirectoryButton.setPrefWidth(Constants.PREFERRED_SIZE);
-    chooseEntityDirectoryButton.setOnAction(new EventHandler<ActionEvent>() {
-      @Override
-      public void handle(final ActionEvent e) {
-        configureDirectoryChooser(directoryChooser);
-        selectedDirectory = directoryChooser.showDialog(stage);
-        if (selectedDirectory == null) {
-          outputTextArea.setText("No Directory selected!");
-        } else {
-          boolean errorExist = false;
-          if (Util.isEmpty(projectcodeField.getText())) {
-            outputTextArea.setText("The projectcode is missing.");
-            errorExist = true;
-          }
-          if (!errorExist) {
-            processFiles();
-          }
-        }
-      }
-    });
-    return chooseEntityDirectoryButton;
-  }
-
+  
   private Button createAboutButton() {
     final Button aboutButton = new Button("About");
     aboutButton.setStyle(Constants.FONT_STYLE);
@@ -186,6 +155,36 @@ public class Main extends Application {
     return aboutButton;
   }
 
+  private static final String TITLE_CHOOSE_ENTITY_DIRECTORY = "Choose Entity directory";
+  private File selectedDirectory;
+
+  private Button createChooseEntityDirectoryButton(final Stage stage, final DirectoryChooser directoryChooser) {
+    final Button chooseEntityDirectoryButton = new Button(TITLE_CHOOSE_ENTITY_DIRECTORY);
+    chooseEntityDirectoryButton.setStyle(Constants.FONT_STYLE);
+    chooseEntityDirectoryButton.setMaxWidth(Constants.PREFERRED_SIZE);
+    chooseEntityDirectoryButton.setPrefWidth(Constants.PREFERRED_SIZE);
+    chooseEntityDirectoryButton.setOnAction(new EventHandler<ActionEvent>() {
+      @Override
+      public void handle(final ActionEvent e) {
+        configureDirectoryChooser(directoryChooser);
+        selectedDirectory = directoryChooser.showDialog(stage);
+        if (selectedDirectory == null) {
+          outputTextArea.setText("No Directory selected!");
+        } else {
+          boolean errorExist = false;
+          if (Util.isEmpty(projectcodeField.getText())) {
+            outputTextArea.setText("The projectcode is missing.");
+            errorExist = true;
+          }
+          if (!errorExist) {
+            processFiles();
+          }
+        }
+      }
+    });
+    return chooseEntityDirectoryButton;
+  }
+
   private static void configureDirectoryChooser(final DirectoryChooser directoryChooser) {
     directoryChooser.setTitle(TITLE_CHOOSE_ENTITY_DIRECTORY);
 
@@ -229,14 +228,14 @@ public class Main extends Application {
         for (File file : files) {
           try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file.getAbsolutePath()))) {
             String currentLine;
-            boolean packageFounded = false;
+            boolean packageFound = false;
             String packageName = null;
-            boolean entityAnnotationFounded = false;
-            boolean nameAnnotationFounded = false;
+            boolean entityAnnotationFound = false;
+            boolean nameAnnotationFound = false;
             String nameAnnotationValue = null;
-            boolean tableAnnotationFounded = false;
+            boolean tableAnnotationFound = false;
             String tableAnnotationValue = null;
-            boolean classNameFounded = false;
+            boolean classNameFound = false;
             String className = null;
 
             while ((currentLine = bufferedReader.readLine()) != null) {
@@ -245,8 +244,8 @@ public class Main extends Application {
               }
               String regex = "package";
               int indexOf = currentLine.indexOf(regex);
-              if (!packageFounded && indexOf != -1) {
-                packageFounded = true;
+              if (!packageFound && indexOf != -1) {
+                packageFound = true;
                 Pattern pattern = Pattern.compile("(hu[.a-zA-Z0-9]+)");
                 Matcher matcher = pattern.matcher(currentLine);
                 if (matcher.find(indexOf + regex.length())) {
@@ -256,8 +255,8 @@ public class Main extends Application {
               }
               regex = "@Name";
               indexOf = currentLine.indexOf(regex);
-              if (!nameAnnotationFounded && indexOf != -1) {
-                nameAnnotationFounded = true;
+              if (!nameAnnotationFound && indexOf != -1) {
+                nameAnnotationFound = true;
                 int beginIndex = currentLine.indexOf("\"", indexOf);
                 int endIndex = currentLine.indexOf("\"", beginIndex + 1);
                 nameAnnotationValue = currentLine.substring(beginIndex + 1, endIndex);
@@ -265,14 +264,14 @@ public class Main extends Application {
               }
               regex = "@Entity";
               indexOf = currentLine.indexOf(regex);
-              if (!entityAnnotationFounded && indexOf != -1) {
-            	  entityAnnotationFounded = true;
+              if (!entityAnnotationFound && indexOf != -1) {
+            	  entityAnnotationFound = true;
             	  continue;
               }
               regex = "@Table";
               indexOf = currentLine.indexOf(regex);
-              if (!tableAnnotationFounded && indexOf != -1) {
-                tableAnnotationFounded = true;
+              if (!tableAnnotationFound && indexOf != -1) {
+                tableAnnotationFound = true;
                 int beginIndex = currentLine.indexOf("\"", indexOf);
                 int endIndex = currentLine.indexOf("\"", beginIndex + 1);
                 tableAnnotationValue = currentLine.substring(beginIndex + 1, endIndex);
@@ -280,8 +279,8 @@ public class Main extends Application {
               }
               regex = "public\\sclass";
               indexOf = Util.indexOf(Pattern.compile(regex), currentLine);
-              if (!classNameFounded && indexOf != -1) {
-                classNameFounded = true;
+              if (!classNameFound && indexOf != -1) {
+                classNameFound = true;
                 Pattern pattern = Pattern.compile("([.a-zA-Z0-9]+)");
                 Matcher matcher = pattern.matcher(currentLine);
                 if (matcher.find(indexOf + regex.length())) {
@@ -290,14 +289,14 @@ public class Main extends Application {
                 }
               }
             }
-            if (entityAnnotationFounded && !Util.isEmpty(nameAnnotationValue) && !Util.isEmpty(tableAnnotationValue)) {
+            if (entityAnnotationFound && !Util.isEmpty(nameAnnotationValue) && !Util.isEmpty(tableAnnotationValue)) {
               output.append(nameAnnotationValue);
               output.append("\t");
               output.append(tableAnnotationValue);
               output.append("\t");
               output.append(projectcode);
               output.append("\n");
-            } else if (entityAnnotationFounded
+            } else if (entityAnnotationFound
                 && (!Util.isEmpty(packageName) && !Util.isEmpty(className)) && !Util.isEmpty(tableAnnotationValue)) {
               output.append(packageName);
               output.append(".");
@@ -307,7 +306,7 @@ public class Main extends Application {
               output.append("\t");
               output.append(projectcode);
               output.append("\n");
-            } else if (entityAnnotationFounded && (!Util.isEmpty(packageName) && !Util.isEmpty(className))) {
+            } else if (entityAnnotationFound && (!Util.isEmpty(packageName) && !Util.isEmpty(className))) {
               output.append(packageName);
               output.append(".");
               output.append(className);
