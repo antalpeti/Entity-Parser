@@ -314,6 +314,10 @@ public class Main extends Application {
           updateProgress(processedFiles, countedFiles);
         }
 
+        if (output.length() > 0) {
+          output.deleteCharAt(output.length() - 1);
+        }
+
         outputTextArea.setText(output.toString());
 
         FileHandler.getInstance().storeProperties(selectedDirectory, Constants.FILEPATH_CONFIG_PROPERTIES,
