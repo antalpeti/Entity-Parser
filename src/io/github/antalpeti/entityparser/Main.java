@@ -231,6 +231,7 @@ public class Main extends Application {
             String currentLine;
             boolean packageFounded = false;
             String packageName = null;
+            boolean entityAnnotationFounded = false;
             boolean nameAnnotationFounded = false;
             String nameAnnotationValue = null;
             boolean tableAnnotationFounded = false;
@@ -262,6 +263,12 @@ public class Main extends Application {
                 nameAnnotationValue = currentLine.substring(beginIndex + 1, endIndex);
                 continue;
               }
+              regex = "@Entity";
+              indexOf = currentLine.indexOf(regex);
+              if (!entityAnnotationFounded && indexOf != -1) {
+            	  entityAnnotationFounded = true;
+            	  continue;
+              }
               regex = "@Table";
               indexOf = currentLine.indexOf(regex);
               if (!tableAnnotationFounded && indexOf != -1) {
@@ -279,15 +286,19 @@ public class Main extends Application {
                 Matcher matcher = pattern.matcher(currentLine);
                 if (matcher.find(indexOf + regex.length())) {
                   className = matcher.group(1);
-                  continue;
+                  break;
                 }
               }
-              if ((nameAnnotationFounded && tableAnnotationFounded) || (packageFounded && classNameFounded && tableAnnotationFounded)) {
-                break;
-              }
             }
-            if (Util.isEmpty(nameAnnotationValue)
-                && (!Util.isEmpty(packageName) && !Util.isEmpty(className) && !Util.isEmpty(tableAnnotationValue))) {
+            if (entityAnnotationFounded && !Util.isEmpty(nameAnnotationValue) && !Util.isEmpty(tableAnnotationValue)) {
+              output.append(nameAnnotationValue);
+              output.append("\t");
+              output.append(tableAnnotationValue);
+              output.append("\t");
+              output.append(projectcode);
+              output.append("\n");
+            } else if (entityAnnotationFounded
+                && (!Util.isEmpty(packageName) && !Util.isEmpty(className)) && !Util.isEmpty(tableAnnotationValue)) {
               output.append(packageName);
               output.append(".");
               output.append(className);
@@ -296,14 +307,16 @@ public class Main extends Application {
               output.append("\t");
               output.append(projectcode);
               output.append("\n");
-            } else if (!Util.isEmpty(nameAnnotationValue) && !Util.isEmpty(tableAnnotationValue)) {
-              output.append(nameAnnotationValue);
+            } else if (entityAnnotationFounded && (!Util.isEmpty(packageName) && !Util.isEmpty(className))) {
+              output.append(packageName);
+              output.append(".");
+              output.append(className);
               output.append("\t");
-              output.append(tableAnnotationValue);
+              output.append(className);
               output.append("\t");
               output.append(projectcode);
               output.append("\n");
-            }
+            } 
           } catch (IOException e) {
             e.printStackTrace();
           }
