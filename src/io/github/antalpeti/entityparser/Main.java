@@ -126,10 +126,7 @@ public class Main extends Application {
           URL url = file.toURI().toURL();
           webEngine.load(url.toString());
 
-          VBox root = new VBox();
-          root.getChildren().addAll(browser);
-
-          Scene scene = new Scene(root);
+          Scene scene = new Scene(browser);
           Stage stage = new Stage();
           scene.addEventHandler(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
             @Override
