@@ -49,7 +49,7 @@ public class Main extends Application {
 
   @Override
   public void start(final Stage stage) {
-    final LabeledField projectcodeLabeledField = createProjectcodeLabeledField();
+    final LabeledField projectidLabeledField = createProjectidLabeledField();
 
     outputTextArea = createOutputTextArea();
 
@@ -63,7 +63,7 @@ public class Main extends Application {
 
     HBox progressHBox = createProgressHBox();
 
-    final GridPane mainGridPane = createMainGridPane(projectcodeLabeledField, progressHBox, chooseEntityDirectoryButton, outputGridPane, aboutButton);
+    final GridPane mainGridPane = createMainGridPane(projectidLabeledField, progressHBox, chooseEntityDirectoryButton, outputGridPane, aboutButton);
 
     final Pane mainPane = createMainPane(mainGridPane);
 
@@ -73,16 +73,16 @@ public class Main extends Application {
     stage.show();
   }
 
-  private TextField projectcodeField;
+  private TextField projectidField;
 
-  private LabeledField createProjectcodeLabeledField() {
-    Label projectcodeLabel = new Label("Projectcode:");
-    projectcodeLabel.setStyle(Constants.FONT_STYLE);
-    projectcodeField = new TextField();
-    projectcodeField.setStyle(Constants.FONT_STYLE);
+  private LabeledField createProjectidLabeledField() {
+    Label projectidLabel = new Label("Projectid:");
+    projectidLabel.setStyle(Constants.FONT_STYLE);
+    projectidField = new TextField();
+    projectidField.setStyle(Constants.FONT_STYLE);
 
-    final LabeledField projectcodeLabeledField = new LabeledField(5, projectcodeLabel, projectcodeField);
-    return projectcodeLabeledField;
+    final LabeledField projectidLabeledField = new LabeledField(5, projectidLabel, projectidField);
+    return projectidLabeledField;
   }
 
   private TextArea createOutputTextArea() {
@@ -109,7 +109,7 @@ public class Main extends Application {
     outputGridPane.add(outputTextArea, 0, 1);
     return outputGridPane;
   }
-  
+
   private Button createAboutButton() {
     final Button aboutButton = new Button("About");
     aboutButton.setStyle(Constants.FONT_STYLE);
@@ -172,8 +172,8 @@ public class Main extends Application {
           outputTextArea.setText("No Directory selected!");
         } else {
           boolean errorExist = false;
-          if (Util.isEmpty(projectcodeField.getText())) {
-            outputTextArea.setText("The projectcode is missing.");
+          if (Util.isEmpty(projectidField.getText())) {
+            outputTextArea.setText("The projectid is missing.");
             errorExist = true;
           }
           if (!errorExist) {
@@ -223,7 +223,7 @@ public class Main extends Application {
 
         StringBuilder output = new StringBuilder();
 
-        String projectcode = projectcodeField.getText();
+        String projectid = projectidField.getText();
 
         for (File file : files) {
           try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file.getAbsolutePath()))) {
@@ -265,8 +265,8 @@ public class Main extends Application {
               regex = "@Entity";
               indexOf = currentLine.indexOf(regex);
               if (!entityAnnotationFound && indexOf != -1) {
-            	  entityAnnotationFound = true;
-            	  continue;
+                entityAnnotationFound = true;
+                continue;
               }
               regex = "@Table";
               indexOf = currentLine.indexOf(regex);
@@ -294,17 +294,16 @@ public class Main extends Application {
               output.append("\t");
               output.append(tableAnnotationValue);
               output.append("\t");
-              output.append(projectcode);
+              output.append(projectid);
               output.append("\n");
-            } else if (entityAnnotationFound
-                && (!Util.isEmpty(packageName) && !Util.isEmpty(className)) && !Util.isEmpty(tableAnnotationValue)) {
+            } else if (entityAnnotationFound && (!Util.isEmpty(packageName) && !Util.isEmpty(className)) && !Util.isEmpty(tableAnnotationValue)) {
               output.append(packageName);
               output.append(".");
               output.append(className);
               output.append("\t");
               output.append(tableAnnotationValue);
               output.append("\t");
-              output.append(projectcode);
+              output.append(projectid);
               output.append("\n");
             } else if (entityAnnotationFound && (!Util.isEmpty(packageName) && !Util.isEmpty(className))) {
               output.append(packageName);
@@ -313,9 +312,9 @@ public class Main extends Application {
               output.append("\t");
               output.append(className);
               output.append("\t");
-              output.append(projectcode);
+              output.append(projectid);
               output.append("\n");
-            } 
+            }
           } catch (IOException e) {
             e.printStackTrace();
           }
@@ -368,17 +367,17 @@ public class Main extends Application {
     return progressHBox;
   }
 
-  private GridPane createMainGridPane(final LabeledField projectcodeLabeledField, HBox progressHBox, final Button chooseEntityDirectoryButton,
+  private GridPane createMainGridPane(final LabeledField projectidLabeledField, HBox progressHBox, final Button chooseEntityDirectoryButton,
       final GridPane outputGridPane, final Button aboutButton) {
     final GridPane mainGridPane = new GridPane();
-    GridPane.setConstraints(projectcodeLabeledField, 0, 0);
+    GridPane.setConstraints(projectidLabeledField, 0, 0);
     GridPane.setConstraints(progressHBox, 0, 1);
     GridPane.setConstraints(chooseEntityDirectoryButton, 0, 2);
     GridPane.setConstraints(outputGridPane, 0, 3);
     GridPane.setConstraints(aboutButton, 0, 4);
     mainGridPane.setHgap(1);
     mainGridPane.setVgap(1);
-    mainGridPane.getChildren().addAll(projectcodeLabeledField, progressHBox, chooseEntityDirectoryButton, outputGridPane, aboutButton);
+    mainGridPane.getChildren().addAll(projectidLabeledField, progressHBox, chooseEntityDirectoryButton, outputGridPane, aboutButton);
     return mainGridPane;
   }
 
