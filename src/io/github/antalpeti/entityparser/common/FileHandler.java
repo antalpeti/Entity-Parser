@@ -7,6 +7,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Properties;
 
@@ -31,20 +33,21 @@ public class FileHandler {
     return outputStream;
   }
 
-  public InputStream createInputStream(String filePath) {
+  public InputStream createInputStream(String filename) {
     InputStream inputStream = null;
     try {
-      inputStream = new FileInputStream(filePath);
+      inputStream = new FileInputStream(filename);
     } catch (FileNotFoundException e) {
       e.printStackTrace();
     }
     return inputStream;
   }
 
-  public void storeProperties(final File selectedDirectory, String filePath, String key, String value) {
-    OutputStream outputStream = createOutputStream(filePath);
-    Properties properties = new Properties();
+  public void storeProperties(String filename, String key, String value) {
+    Properties properties = getProperties(filename);
     properties.setProperty(key, value);
+
+    OutputStream outputStream = createOutputStream(filename);
     try {
       properties.store(outputStream, null);
     } catch (IOException e1) {
@@ -60,8 +63,8 @@ public class FileHandler {
     }
   }
 
-  public String loadProperty(String filePath, String key) {
-    InputStream inputStream = createInputStream(filePath);
+  public String loadProperty(String filename, String key) {
+    InputStream inputStream = createInputStream(filename);
     Properties properties = new Properties();
     try {
       properties.load(inputStream);
@@ -78,6 +81,36 @@ public class FileHandler {
       }
     }
     return null;
+  }
+
+  public Properties getProperties(String filename) {
+    if (!isPropertiesFileExist(filename)) {
+      return new Properties();
+    }
+    InputStream inputStream = createInputStream(filename);
+    Properties properties = new Properties();
+    try {
+      properties.load(inputStream);
+      return properties;
+    } catch (IOException e) {
+      e.printStackTrace();
+    } finally {
+      if (inputStream != null) {
+        try {
+          inputStream.close();
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
+    }
+    return null;
+  }
+
+  public boolean isPropertiesFileExist(String filename) {
+    Path currentRelativePath = Paths.get("");
+    String configPropertiesAbsolutePath = currentRelativePath.toAbsolutePath().toString() + File.separator + filename;
+    File f = new File(configPropertiesAbsolutePath);
+    return f.exists() && !f.isDirectory();
   }
 
   public void listDirectories(File directory, List<File> files) {

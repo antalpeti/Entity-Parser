@@ -18,6 +18,8 @@ import io.github.antalpeti.entityparser.common.FileHandler;
 import io.github.antalpeti.entityparser.common.Util;
 import io.github.antalpeti.entityparser.uielement.LabeledField;
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -67,7 +69,42 @@ public class Main extends Application {
 
     final Pane mainPane = createMainPane(mainGridPane);
 
-    Scene scene = new Scene(mainPane, 800, 800);
+    Scene scene = new Scene(mainPane);
+    scene.widthProperty().addListener(new ChangeListener<Number>() {
+      @Override
+      public void changed(ObservableValue<? extends Number> observableValue, Number oldSceneWidth, Number newSceneWidth) {
+        FileHandler.getInstance().storeProperties(Constants.FILENAME_CONFIG_PROPERTIES, Constants.CONFIG_PROPERTIES_MAIN_WINDOW_WIDTH,
+            newSceneWidth.toString());
+      }
+    });
+    scene.heightProperty().addListener(new ChangeListener<Number>() {
+      @Override
+      public void changed(ObservableValue<? extends Number> observableValue, Number oldSceneHeight, Number newSceneHeight) {
+        FileHandler.getInstance().storeProperties(Constants.FILENAME_CONFIG_PROPERTIES, Constants.CONFIG_PROPERTIES_MAIN_WINDOW_HEIGHT,
+            newSceneHeight.toString());
+      }
+    });
+
+    String mainWindowWidth = null;
+    if (FileHandler.getInstance().isPropertiesFileExist(Constants.FILENAME_CONFIG_PROPERTIES)) {
+      mainWindowWidth = FileHandler.getInstance().loadProperty(Constants.FILENAME_CONFIG_PROPERTIES, Constants.CONFIG_PROPERTIES_MAIN_WINDOW_WIDTH);
+    }
+    if (mainWindowWidth != null) {
+      stage.setWidth(Double.parseDouble(mainWindowWidth));
+    } else {
+      stage.setWidth(800);
+    }
+
+    String mainWindowHeight = null;
+    if (FileHandler.getInstance().isPropertiesFileExist(Constants.FILENAME_CONFIG_PROPERTIES)) {
+      mainWindowHeight = FileHandler.getInstance().loadProperty(Constants.FILENAME_CONFIG_PROPERTIES, Constants.CONFIG_PROPERTIES_MAIN_WINDOW_HEIGHT);
+    }
+    if (mainWindowHeight != null) {
+      stage.setHeight(Double.parseDouble(mainWindowHeight));
+    } else {
+      stage.setHeight(800);
+    }
+
     stage.setTitle("Entity Parser");
     stage.setScene(scene);
     stage.show();
@@ -122,7 +159,7 @@ public class Main extends Application {
         final WebEngine webEngine = browser.getEngine();
         try {
           Path currentRelativePath = Paths.get("");
-          File file = new File(currentRelativePath.toAbsolutePath().toString() + File.separator + Constants.FILEPATH_ABOUT_HTML);
+          File file = new File(currentRelativePath.toAbsolutePath().toString() + File.separator + Constants.FILENAME_ABOUT_HTML);
           URL url = file.toURI().toURL();
           webEngine.load(url.toString());
 
@@ -137,11 +174,45 @@ public class Main extends Application {
             }
           });
 
+          stage.widthProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, Number oldSceneWidth, Number newSceneWidth) {
+              FileHandler.getInstance().storeProperties(Constants.FILENAME_CONFIG_PROPERTIES, Constants.CONFIG_PROPERTIES_ABOUT_WINDOW_WIDTH,
+                  newSceneWidth.toString());
+            }
+          });
+          stage.heightProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, Number oldSceneHeight, Number newSceneHeight) {
+              FileHandler.getInstance().storeProperties(Constants.FILENAME_CONFIG_PROPERTIES, Constants.CONFIG_PROPERTIES_ABOUT_WINDOW_HEIGHT,
+                  newSceneHeight.toString());
+            }
+          });
+
+          String aboutWindowWidth = null;
+          if (FileHandler.getInstance().isPropertiesFileExist(Constants.FILENAME_CONFIG_PROPERTIES)) {
+            aboutWindowWidth = FileHandler.getInstance().loadProperty(Constants.FILENAME_CONFIG_PROPERTIES,
+                Constants.CONFIG_PROPERTIES_ABOUT_WINDOW_WIDTH);
+          }
+          if (aboutWindowWidth != null) {
+            stage.setWidth(Double.parseDouble(aboutWindowWidth));
+          } else {
+            stage.setWidth(800);
+          }
+
+          String aboutWindowHeight = null;
+          if (FileHandler.getInstance().isPropertiesFileExist(Constants.FILENAME_CONFIG_PROPERTIES)) {
+            aboutWindowHeight = FileHandler.getInstance().loadProperty(Constants.FILENAME_CONFIG_PROPERTIES,
+                Constants.CONFIG_PROPERTIES_ABOUT_WINDOW_HEIGHT);
+          }
+          if (aboutWindowHeight != null) {
+            stage.setHeight(Double.parseDouble(aboutWindowHeight));
+          } else {
+            stage.setHeight(800);
+          }
+
           stage.setTitle("About");
           stage.setScene(scene);
-          stage.setWidth(800);
-          stage.setHeight(800);
-
           stage.show();
         } catch (MalformedURLException ex) {
           ex.printStackTrace();
@@ -176,6 +247,8 @@ public class Main extends Application {
           if (!errorExist) {
             processFiles();
           }
+          FileHandler.getInstance().storeProperties(Constants.FILENAME_CONFIG_PROPERTIES, Constants.CONFIG_PROPERTIES_SELECTED_DIRECTORY,
+              selectedDirectory.getAbsolutePath());
         }
       }
     });
@@ -186,12 +259,9 @@ public class Main extends Application {
     directoryChooser.setTitle(TITLE_CHOOSE_ENTITY_DIRECTORY);
 
     String lastSelectedDirectory = null;
-    Path currentRelativePath = Paths.get("");
-    String configPropertiesAbsolutePath = currentRelativePath.toAbsolutePath().toString() + File.separator + Constants.FILEPATH_CONFIG_PROPERTIES;
-    File f = new File(configPropertiesAbsolutePath);
-    if (f.exists() && !f.isDirectory()) {
-      lastSelectedDirectory = FileHandler.getInstance().loadProperty(Constants.FILEPATH_CONFIG_PROPERTIES,
-          Constants.CONFIG_PROPERTIES_LAST_SELECTED_DIRECTORY);
+    if (FileHandler.getInstance().isPropertiesFileExist(Constants.FILENAME_CONFIG_PROPERTIES)) {
+      lastSelectedDirectory = FileHandler.getInstance().loadProperty(Constants.FILENAME_CONFIG_PROPERTIES,
+          Constants.CONFIG_PROPERTIES_SELECTED_DIRECTORY);
     }
     if (lastSelectedDirectory != null) {
       directoryChooser.setInitialDirectory(new File(lastSelectedDirectory));
@@ -326,8 +396,6 @@ public class Main extends Application {
 
         outputTextArea.setText(output.toString());
 
-        FileHandler.getInstance().storeProperties(selectedDirectory, Constants.FILEPATH_CONFIG_PROPERTIES,
-            Constants.CONFIG_PROPERTIES_LAST_SELECTED_DIRECTORY, selectedDirectory.getAbsolutePath());
         return null;
       }
 
