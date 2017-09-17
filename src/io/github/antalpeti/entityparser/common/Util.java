@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 public class Util {
   public static boolean isEmpty(String value) {
-    return value == null || value.isEmpty();
+    return value == null || value.trim().isEmpty();
   }
 
   public static int indexOf(Pattern pattern, String s) {
