@@ -290,7 +290,7 @@ public class Main extends Application {
 
         StringBuilder output = new StringBuilder();
 
-        String projectid = projectidField.getText();
+        String projectid = projectidField.getText().trim();
 
         for (File file : files) {
           try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file.getAbsolutePath()))) {
