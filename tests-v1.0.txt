@@ -1,0 +1,23 @@
+The "Projectid" label is visible. --- OK
+The "Projectid" field is visible and editable. --- OK
+The "Progress" label is visible.--- OK
+The "Progress" bar is visible and initialized with 0.--- OK
+The "Progress" indicator is visible and initialized with 0.--- OK
+The "Choose Entity directory" button is visible and enabled. --- OK
+The "Output" label is visible. --- OK
+The "Output" textarea is visible and enabled. --- OK
+The "About" button is visible and enabled. --- OK
+If main window resized then all element resized. --- OK
+
+After "Choose Entity directory" selected a directory chooser apears. --- OK
+The directory chooser shows the user directory at the first time. --- OK
+The directory chooser shows the last selected directory after the first use. --- OK
+If no directory selected then the "No Directory selected!" message appears. --- OK
+If a directory selected but the Projectid field is empty then the "The projectid is missing." error message appears. --- OK
+If a directory selected but the Projectid field is filled with whitespaces then the "The projectid is missing." error message appears. --- OK
+If a directory selected but the Projectid field is filled with projectid and whitespaces then the extra whitespaces removed. --- OK
+The last height and width will be show when relunch the application. --- OK
+The "About" option show the about dialog. --- OK
+The about dialog contains a "Release notes" section. --- OK
+The about dialog contains a "Contributors" section. --- OK
+The escape key close the about dialog. --- OK
