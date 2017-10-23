@@ -263,7 +263,7 @@ public class Main extends Application {
       lastSelectedDirectory = FileHandler.getInstance().loadProperty(Constants.FILENAME_CONFIG_PROPERTIES,
           Constants.CONFIG_PROPERTIES_SELECTED_DIRECTORY);
     }
-    if (lastSelectedDirectory != null) {
+    if (lastSelectedDirectory != null && new File(lastSelectedDirectory).isDirectory()) {
       directoryChooser.setInitialDirectory(new File(lastSelectedDirectory));
     } else {
       directoryChooser.setInitialDirectory(new File(System.getProperty("user.home")));
