@@ -51,7 +51,7 @@ public class Main extends Application {
 
   @Override
   public void start(final Stage stage) {
-    final LabeledField projectidLabeledField = createProjectidLabeledField();
+    final LabeledField projectIdLabeledField = createProjectIdLabeledField();
 
     outputTextArea = createOutputTextArea();
 
@@ -65,7 +65,7 @@ public class Main extends Application {
 
     HBox progressHBox = createProgressHBox();
 
-    final GridPane mainGridPane = createMainGridPane(projectidLabeledField, progressHBox, chooseEntityDirectoryButton, outputGridPane, aboutButton);
+    final GridPane mainGridPane = createMainGridPane(projectIdLabeledField, progressHBox, chooseEntityDirectoryButton, outputGridPane, aboutButton);
 
     final Pane mainPane = createMainPane(mainGridPane);
 
@@ -110,16 +110,16 @@ public class Main extends Application {
     stage.show();
   }
 
-  private TextField projectidField;
+  private TextField projectIdField;
 
-  private LabeledField createProjectidLabeledField() {
-    Label projectidLabel = new Label("Projectid:");
-    projectidLabel.setStyle(Constants.FONT_STYLE);
-    projectidField = new TextField();
-    projectidField.setStyle(Constants.FONT_STYLE);
+  private LabeledField createProjectIdLabeledField() {
+    Label projectIdLabel = new Label("Project ID:");
+    projectIdLabel.setStyle(Constants.FONT_STYLE);
+    projectIdField = new TextField();
+    projectIdField.setStyle(Constants.FONT_STYLE);
 
-    final LabeledField projectidLabeledField = new LabeledField(5, projectidLabel, projectidField);
-    return projectidLabeledField;
+    final LabeledField projectIdLabeledField = new LabeledField(5, projectIdLabel, projectIdField);
+    return projectIdLabeledField;
   }
 
   private TextArea createOutputTextArea() {
@@ -240,8 +240,8 @@ public class Main extends Application {
           outputTextArea.setText("No Directory selected!");
         } else {
           boolean errorExist = false;
-          if (Util.isEmpty(projectidField.getText())) {
-            outputTextArea.setText("The projectid is missing.");
+          if (Util.isEmpty(projectIdField.getText())) {
+            outputTextArea.setText("The Project ID is missing.");
             errorExist = true;
           }
           if (!errorExist) {
@@ -290,7 +290,7 @@ public class Main extends Application {
 
         StringBuilder output = new StringBuilder();
 
-        String projectid = projectidField.getText().trim();
+        String projectId = projectIdField.getText().trim();
 
         for (File file : files) {
           try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file.getAbsolutePath()))) {
@@ -361,7 +361,7 @@ public class Main extends Application {
               output.append("\t");
               output.append(tableAnnotationValue);
               output.append("\t");
-              output.append(projectid);
+              output.append(projectId);
               output.append("\n");
             } else if (entityAnnotationFound && (!Util.isEmpty(packageName) && !Util.isEmpty(className)) && !Util.isEmpty(tableAnnotationValue)) {
               output.append(packageName);
@@ -370,7 +370,7 @@ public class Main extends Application {
               output.append("\t");
               output.append(tableAnnotationValue);
               output.append("\t");
-              output.append(projectid);
+              output.append(projectId);
               output.append("\n");
             } else if (entityAnnotationFound && (!Util.isEmpty(packageName) && !Util.isEmpty(className))) {
               output.append(packageName);
@@ -379,7 +379,7 @@ public class Main extends Application {
               output.append("\t");
               output.append(className);
               output.append("\t");
-              output.append(projectid);
+              output.append(projectId);
               output.append("\n");
             }
           } catch (IOException e) {
@@ -432,17 +432,17 @@ public class Main extends Application {
     return progressHBox;
   }
 
-  private GridPane createMainGridPane(final LabeledField projectidLabeledField, HBox progressHBox, final Button chooseEntityDirectoryButton,
+  private GridPane createMainGridPane(final LabeledField projectIdLabeledField, HBox progressHBox, final Button chooseEntityDirectoryButton,
       final GridPane outputGridPane, final Button aboutButton) {
     final GridPane mainGridPane = new GridPane();
-    GridPane.setConstraints(projectidLabeledField, 0, 0);
+    GridPane.setConstraints(projectIdLabeledField, 0, 0);
     GridPane.setConstraints(progressHBox, 0, 1);
     GridPane.setConstraints(chooseEntityDirectoryButton, 0, 2);
     GridPane.setConstraints(outputGridPane, 0, 3);
     GridPane.setConstraints(aboutButton, 0, 4);
     mainGridPane.setHgap(1);
     mainGridPane.setVgap(1);
-    mainGridPane.getChildren().addAll(projectidLabeledField, progressHBox, chooseEntityDirectoryButton, outputGridPane, aboutButton);
+    mainGridPane.getChildren().addAll(projectIdLabeledField, progressHBox, chooseEntityDirectoryButton, outputGridPane, aboutButton);
     return mainGridPane;
   }
 
