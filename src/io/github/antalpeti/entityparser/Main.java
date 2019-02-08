@@ -214,8 +214,9 @@ public class Main extends Application {
           stage.setTitle("About");
           stage.setScene(scene);
           stage.show();
-        } catch (MalformedURLException ex) {
+        } catch (Exception ex) {
           ex.printStackTrace();
+          outputTextArea.setText(ex.toString());
         }
 
       }
@@ -326,7 +327,7 @@ public class Main extends Application {
                 nameAnnotationFound = true;
                 int beginIndex = currentLine.indexOf("\"", indexOf);
                 int endIndex = currentLine.indexOf("\"", beginIndex + 1);
-                nameAnnotationValue = currentLine.substring(beginIndex + 1, endIndex);
+                nameAnnotationValue = endIndex > beginIndex ? currentLine.substring(beginIndex + 1, endIndex) : "";
                 continue;
               }
               regex = "@Entity";
@@ -341,7 +342,7 @@ public class Main extends Application {
                 tableAnnotationFound = true;
                 int beginIndex = currentLine.indexOf("\"", indexOf);
                 int endIndex = currentLine.indexOf("\"", beginIndex + 1);
-                tableAnnotationValue = currentLine.substring(beginIndex + 1, endIndex);
+                tableAnnotationValue = endIndex > beginIndex ? currentLine.substring(beginIndex + 1, endIndex) : "";
                 continue;
               }
               regex = "public\\sclass";
@@ -382,8 +383,11 @@ public class Main extends Application {
               output.append(projectId);
               output.append("\n");
             }
-          } catch (IOException e) {
+          } catch (Exception e) {
             e.printStackTrace();
+            output.append(e.toString());
+            output.append("\n");
+            outputTextArea.setText(e.toString());
           }
 
           ++processedFiles;
